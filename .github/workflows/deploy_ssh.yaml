@@ -74,7 +74,7 @@ jobs:
           script_stop: true
           script: | # chmod +x ${{ inputs.PRE_RUN_SCRIPT }}
             cd ${{ inputs.REMOTE_FOLDER }}
-            ${{ inputs.PRE_RUN_SCRIPT }} 
+            sh ${{ inputs.PRE_RUN_SCRIPT }} 
 
       - name: Run Process
         uses: appleboy/ssh-action@master
