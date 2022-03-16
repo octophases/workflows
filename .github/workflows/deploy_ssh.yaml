@@ -32,7 +32,7 @@ jobs:
         with:
           url: ${{ secrets.NOTIFICATION_URL }}
           method: 'POST'
-          data: '{ "message": "Deploying ${{ inputs.APP_NAME }}", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
+          data: '{ "message": "${{ inputs.APP_NAME }} build triggered", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
@@ -54,7 +54,7 @@ jobs:
         with:
           url: ${{ secrets.NOTIFICATION_URL }}
           method: 'POST'
-          data: '{ "message": "Restarting ${{ inputs.APP_NAME }}!", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
+          data: '{ "message": "Deployed ${{ inputs.APP_NAME }}!", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
 
       - name: Notify Failure
         if: failure()
@@ -62,5 +62,5 @@ jobs:
         with:
           url: ${{ secrets.NOTIFICATION_URL }}
           method: 'POST'
-          data: '{ "message": "${{ inputs.APP_NAME }} failed to build!", "emergency": true, "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
+          data: '{ "message": "${{ inputs.APP_NAME }} failed to deploy!", "emergency": true, "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
 
