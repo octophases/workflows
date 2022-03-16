@@ -37,13 +37,7 @@ jobs:
           method: 'POST'
           data: '{ "message": "${{ inputs.APP_NAME }} build triggered", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
 
-      - name: Run pre-run script if provided
-        if: "${{ inputs.PRE_RUN_SCRIPT != '' }}"
-        run: | 
-          chmod +x ${{ inputs.PRE_RUN_SCRIPT }}
-          ${{ inputs.PRE_RUN_SCRIPT }}
-
-      - name: Deploy to Server
+      - name: Stop Process
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -55,6 +49,44 @@ jobs:
             cd ${{ inputs.REMOTE_FOLDER }}
             docker-compose down || true
             git pull
+            docker-compose up -d --build
+
+      - name: Pull Latest Code
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            cd ${{ inputs.REMOTE_FOLDER }}
+            git pull   
+
+      - name: Run pre-run script if provided
+        if: "${{ inputs.PRE_RUN_SCRIPT != '' }}"
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            cd ${{ inputs.REMOTE_FOLDER }}
+            chmod +x ${{ inputs.PRE_RUN_SCRIPT }}
+            ${{ inputs.PRE_RUN_SCRIPT }} 
+
+      - name: Run Process
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            cd ${{ inputs.REMOTE_FOLDER }}
             docker-compose up -d --build
 
       - name: Notify Finish
