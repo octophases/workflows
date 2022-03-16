@@ -1,0 +1,66 @@
+name: Deploy over SSH
+
+on:
+  workflow_call:
+    inputs:
+      REMOTE_FOLDER:
+        required: true
+        type: string
+      APP_NAME:
+        required: true
+        type: string
+    secrets:
+      SERVER_IP:
+        required: true
+      SERVER_SSH_KEY:
+        required: true
+      NOTIFICATION_URL:
+        required: true
+      NOTIFICATION_SECRET:
+        required: true
+
+jobs:
+  
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Start
+        uses: fjogeleit/http-request-action@master
+        continue-on-error: true
+        with:
+          url: ${{ secrets.NOTIFICATION_URL }}
+          method: 'POST'
+          data: '{ "message": "Deploying ${{ input.APP_NAME }}", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            cd ${{ inputs.REMOTE_FOLDER }}
+            docker-compose down || true
+            git pull
+            docker-compose up -d --build
+
+      - name: Notify Finish
+        if: success()
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: ${{ secrets.NOTIFICATION_URL }}
+          method: 'POST'
+          data: '{ "message": "Restarting ${{ input.APP_NAME }}!", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
+
+      - name: Notify Failure
+        if: failure()
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: ${{ secrets.NOTIFICATION_URL }}
+          method: 'POST'
+          data: '{ "message": "${{ input.APP_NAME }} failed to build!", "emergency": true, "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
+
