@@ -39,8 +39,9 @@ jobs:
 
       - name: Run pre-run script if provided
         if: "${{ inputs.PRE_RUN_SCRIPT != '' }}"
-        run: | # chmod +x ${{ inputs.PRE_RUN_SCRIPT }}
-          sh ${{ inputs.PRE_RUN_SCRIPT }}
+        run: | 
+          chmod +x ${{ inputs.PRE_RUN_SCRIPT }}
+          ${{ inputs.PRE_RUN_SCRIPT }}
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
