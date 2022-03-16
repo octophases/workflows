@@ -48,8 +48,6 @@ jobs:
           script: |
             cd ${{ inputs.REMOTE_FOLDER }}
             docker-compose down || true
-            git pull
-            docker-compose up -d --build
 
       - name: Pull Latest Code
         uses: appleboy/ssh-action@master
