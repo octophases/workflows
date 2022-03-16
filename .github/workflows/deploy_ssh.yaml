@@ -9,6 +9,9 @@ on:
       APP_NAME:
         required: true
         type: string
+      PRE_RUN_SCRIPT:
+        required: false
+        type: string
     secrets:
       SERVER_IP:
         required: true
@@ -33,6 +36,11 @@ jobs:
           url: ${{ secrets.NOTIFICATION_URL }}
           method: 'POST'
           data: '{ "message": "${{ inputs.APP_NAME }} build triggered", "app": "octo", "auth": "${{ secrets.NOTIFICATION_SECRET }}" }'
+
+      - name: Run pre-run script if provided
+        if: "${{ inputs.PRE_RUN_SCRIPT != '' }}"
+        run: |
+          sh ${{ inputs.PRE_RUN_SCRIPT }}
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
