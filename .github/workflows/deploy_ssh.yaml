@@ -72,9 +72,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script_stop: true
-          script: |
+          script: | # chmod +x ${{ inputs.PRE_RUN_SCRIPT }}
             cd ${{ inputs.REMOTE_FOLDER }}
-            chmod +x ${{ inputs.PRE_RUN_SCRIPT }}
             ${{ inputs.PRE_RUN_SCRIPT }} 
 
       - name: Run Process
