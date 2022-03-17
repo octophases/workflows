@@ -89,6 +89,7 @@ jobs:
       - name: Notify Finish
         if: success()
         uses: fjogeleit/http-request-action@master
+        continue-on-error: true
         with:
           url: ${{ secrets.NOTIFICATION_URL }}
           method: 'POST'
@@ -97,6 +98,7 @@ jobs:
       - name: Notify Failure
         if: failure()
         uses: fjogeleit/http-request-action@master
+        continue-on-error: true
         with:
           url: ${{ secrets.NOTIFICATION_URL }}
           method: 'POST'
