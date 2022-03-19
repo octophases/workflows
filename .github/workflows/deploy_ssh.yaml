@@ -59,7 +59,7 @@ jobs:
           script_stop: true
           script: |
             cd ${{ inputs.REMOTE_FOLDER }}
-            git pull   ""
+            git pull
 
       - name: Run pre-run script if provided
         if: "${{ inputs.PRE_RUN_SCRIPT != '' }}"
